@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 4000;
 let refreshTokens = []
 
 app.get('/',async(req,res)=>{
-    res.send('Server up and running...')
+    res.send('Server up and running..')
 })
 
 
@@ -92,12 +92,12 @@ app.post('/add-user',async(req,res)=>{
 app.get('/users',authenticateToken,async(req,res)=>{
 
     const URL = 'https://immense-elk-72.hasura.app/api/rest/users';
-    console.log(req.user.data);
+    console.log("req user data",req.user);
     let user_id;
     try{
-        let data = String(req.user.data);
+        let data = JSON.stringify(req.user.data);
         let userIdData = data.split('user_id')[1];
-        user_id = userIdData.substring(3,userIdData.length-4);
+        user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
         console.log("user_id=",user_id);
     }catch(err){
         res.status(500).send("Internal Error, please login again");
@@ -131,9 +131,9 @@ app.get('/devices',authenticateToken,async(req,res)=>{
     console.log(req.user.data);
     let user_id;
     try{
-        let data = String(req.user.data);
+        let data = JSON.stringify(req.user.data);
         let userIdData = data.split('user_id')[1];
-        user_id = userIdData.substring(3,userIdData.length-4);
+        user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
         console.log("user_id=",user_id);
     }catch(err){
         res.status(500).send("Internal Error, please login again");
@@ -167,9 +167,9 @@ app.post('/add-device',authenticateToken,async(req,res)=>{
 
     let user_id;
     try{
-        let data = String(req.user.data);
+        let data = JSON.stringify(req.user.data);
         let userIdData = data.split('user_id')[1];
-        user_id = userIdData.substring(3,userIdData.length-4);
+        user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
         console.log("user_id=",user_id);
     }catch(err){
         res.status(500).send("Internal Error, please login again");
@@ -212,9 +212,9 @@ app.post('/update-device',authenticateToken,async(req,res)=>{
 
     let user_id;
     try{
-        let data = String(req.user.data);
+        let data = JSON.stringify(req.user.data);
         let userIdData = data.split('user_id')[1];
-        user_id = userIdData.substring(3,userIdData.length-4);
+        user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
         console.log("user_id=",user_id);
     }catch(err){
         res.status(500).send("Internal Error, please login again");
@@ -267,9 +267,9 @@ app.delete('/delete-device',authenticateToken,async(req,res)=>{
 
     let user_id;
     try{
-        let data = String(req.user.data);
+        let data = JSON.stringify(req.user.data);
         let userIdData = data.split('user_id')[1];
-        user_id = userIdData.substring(3,userIdData.length-4);
+        user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
         console.log("user_id=",user_id);
     }catch(err){
         res.status(500).send("Internal Error, please login again");
@@ -304,9 +304,9 @@ app.post('/add-cycle',authenticateToken,async(req,res)=>{
 
     let user_id;
     try{
-        let data = String(req.user.data);
+        let data = JSON.stringify(req.user.data);
         let userIdData = data.split('user_id')[1];
-        user_id = userIdData.substring(3,userIdData.length-4);
+        user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
         console.log("user_id=",user_id);
     }catch(err){
         res.status(500).send("Internal Error, please login again");
@@ -353,9 +353,9 @@ app.get('/cycles',authenticateToken,async(req,res)=>{
 
     let user_id;
     try{
-        let data = String(req.user.data);
+        let data = JSON.stringify(req.user.data);
         let userIdData = data.split('user_id')[1];
-        user_id = userIdData.substring(3,userIdData.length-4);
+        user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
         console.log("user_id=",user_id);
     }catch(err){
         res.status(500).send("Internal Error, please login again");
@@ -395,9 +395,9 @@ function authenticateToken(req, res, next) {
     if (token == null) return res.sendStatus(401)
   
     jwt.verify(token,process.env.ACCESS_TOKEN, (err, user) => {
-      console.log("error="+err)
       if (err) return res.sendStatus(403)
       req.user = user
+      console.log("req user",req.user)
       next()
     })
 }
@@ -409,6 +409,7 @@ function generateAccessToken(data) {
 }
 
 // api to generate a new token if token is expired using a refresh token
+
 app.post('/token',(req, res) => {
     const refreshToken = req.body.token
     if (refreshToken == null) return res.sendStatus(401)
@@ -424,6 +425,7 @@ app.post('/token',(req, res) => {
 
 app.post('/logout', (req, res) => {
     refreshTokens = refreshTokens.filter(token => token !== req.body.token)
+    console.log(req);
     res.sendStatus(204)
 })
 
