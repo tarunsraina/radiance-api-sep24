@@ -18,7 +18,7 @@ app.get('/',async(req,res)=>{
 
 
 //login api
-app.post('/login',(req,res)=>{
+app.post('/login',async(req,res)=>{
     let status1;
     console.log(req.body.username);
     console.log(req.body.password);
@@ -41,18 +41,40 @@ app.post('/login',(req,res)=>{
             'x-hasura-admin-secret':process.env.x_hasura_admin_secret
         }
     }).then(res => Promise.all([res.status, res.text()]))
-    .then(([status, textData]) => {
+    .then(async([status, textData]) => {
         if(textData.includes("[]" || status1==400)){
             res.status(401).send("No user found")
         }else if(textData.includes("FATAL") || textData.includes("failed")){
             res.status(500).send("Internal server error");
         }else{
+        const URL = 'https://immense-elk-72.hasura.app/api/rest/devices';
+        let userIdData = textData.split('user_id')[1];
+        let user_id =userIdData.replace(/[^a-zA-Z-0-9]/g, "").trim();
+        console.log(user_id)
+        const options = {
+            method : 'GET',
+            headers : {
+                'Content-Type': 'application/json',
+                'x-hasura-admin-secret':process.env.x_hasura_admin_secret,
+                'X-Hasura-Role':'user','X-Hasura-User-Id':`${user_id}`
+            }
+        }
+    
+    
+        const response = await fetch(URL,options)
+    
+        .then(res=>res.json())
+        .catch(err=>res.status(500).send(err))
+    
+        //res.json(response)
+        
         const accessToken = generateAccessToken(textData)
         const refreshToken = jwt.sign(textData, process.env.REFRESH_TOKEN)
         refreshTokens.push(refreshToken);
         //res.sendStatus(200);
+        let device_list=response.devices;
         return res.json({
-            accessToken,refreshToken
+            accessToken,refreshToken,device_list
           })
         }
       })
