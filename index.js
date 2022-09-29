@@ -200,13 +200,14 @@ app.post('/add-device',authenticateToken,async(req,res)=>{
 
     let device = {
         object : {
-        battery_percentage : req.body.battery_percentage,
+        //battery_percentage : req.body.battery_percentage,
         user_id : user_id,
         device_name : req.body.device_name,
-        led_blink_intensity : req.body.led_blink_intensity,
-        vibration_intensity : req.body.vibration_intensity,
-        device_version : req.body.device_version,
-        firmware_version : req.body.firmware_version
+        MAC_ADDRESS : req.body.MAC_ADDRESS
+        // led_blink_intensity : req.body.led_blink_intensity,
+        // vibration_intensity : req.body.vibration_intensity,
+        // device_version : req.body.device_version,
+        // firmware_version : req.body.firmware_version
         }
     }
 
