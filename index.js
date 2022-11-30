@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 4000;
 let refreshTokens = []
 
 app.get('/',async(req,res)=>{
-    res.send('Server up and running..')
+    res.send('Server up and running...')
 })
 
 
